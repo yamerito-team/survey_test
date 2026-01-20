@@ -3,144 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encuesta Rápida de Satisfacción</title>
+    <title>Encuesta de Satisfacción Profesional</title>
     <style>
-        /* Estilos Modernos */
+        :root {
+            --primary-color: #0078d4;
+            --bg-color: #f3f2f1;
+            --card-bg: #ffffff;
+            --text-main: #323130;
+            --text-secondary: #605e5c;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
         }
 
-        .card {
-            background: white;
+        .survey-container {
+            background: var(--card-bg);
+            width: 90%;
+            max-width: 500px;
             padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 450px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
         }
 
-        h2 { color: #333; margin-top: 0; }
-        p { color: #666; font-size: 0.9rem; }
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #edebe9;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
 
-        .options {
-            margin: 1.5rem 0;
+        .progress-bar {
+            height: 100%;
+            background: var(--primary-color);
+            width: 10%; /* Dinámico */
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        .step-counter {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        /* Preguntas */
+        .question-slide {
+            display: none; /* Se activan con JS */
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-group {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
-        .option-btn {
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            background: none;
+        .option-label {
+            padding: 15px;
+            border: 1px solid #c8c6c4;
+            border-radius: 4px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: left;
-            font-size: 1rem;
+            transition: all 0.2s;
+            display: block;
         }
 
-        .option-btn:hover {
-            border-color: #4CAF50;
-            background-color: #f0fff0;
+        .option-label:hover {
+            background-color: #f3f2f1;
+            border-color: var(--primary-color);
         }
 
-        .option-btn.selected {
-            background-color: #4CAF50;
-            color: white;
-            border-color: #4CAF50;
+        input[type="radio"] {
+            margin-right: 10px;
+            accent-color: var(--primary-color);
         }
 
-        button#submit-btn {
-            width: 100%;
-            padding: 12px;
-            background-color: #007BFF;
-            color: white;
+        /* Navegación */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        button {
+            padding: 10px 20px;
             border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
+            border-radius: 4px;
             cursor: pointer;
-            transition: background 0.3s;
+            font-weight: 600;
+            transition: opacity 0.3s;
         }
 
-        button#submit-btn:disabled {
-            background-color: #ccc;
+        .btn-next { background: var(--primary-color); color: white; }
+        .btn-prev { background: #edebe9; color: var(--text-main); }
+        
+        button:disabled {
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
-        #result {
-            display: none;
+        #final-screen {
             text-align: center;
+            display: none;
         }
-
-        .success-icon { font-size: 3rem; color: #4CAF50; }
     </style>
 </head>
 <body>
 
-    <div class="card" id="poll-container">
-        <div id="survey-form">
-            <h2>Encuesta Rápida</h2>
-            <p>¿Qué tan útil te pareció esta herramienta?</p>
-            
-            <div class="options">
-                <button class="option-btn" onclick="selectOption(this, 'Excelente')">🌟 Excelente</button>
-                <button class="option-btn" onclick="selectOption(this, 'Buena')">🙂 Buena</button>
-                <button class="option-btn" onclick="selectOption(this, 'Regular')">😐 Regular</button>
-                <button class="option-btn" onclick="selectOption(this, 'Mala')">☹️ Mala</button>
-            </div>
-
-            <button id="submit-btn" onclick="submitSurvey()" disabled>Enviar Respuesta</button>
+<div class="survey-container">
+    <div id="survey-content">
+        <div class="step-counter">Pregunta <span id="current-step">1</span> de 10</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="pb"></div>
         </div>
 
-        <div id="result">
-            <div class="success-icon">✓</div>
-            <h2>¡Gracias!</h2>
-            <p id="feedback-msg"></p>
-            <button onclick="resetSurvey()" style="background: none; border: none; color: #007BFF; cursor: pointer; text-decoration: underline;">Volver a votar</button>
+        <form id="poll-form">
+            <div id="questions-wrapper"></div>
+        </form>
+
+        <div class="nav-buttons">
+            <button class="btn-prev" id="prevBtn" onclick="changeStep(-1)" disabled>Anterior</button>
+            <button class="btn-next" id="nextBtn" onclick="changeStep(1)" disabled>Siguiente</button>
         </div>
     </div>
 
-    <script>
-        let selectedValue = "";
+    <div id="final-screen">
+        <h1 style="color: #107c10;">✔</h1>
+        <h2>¡Encuesta Completada!</h2>
+        <p>Tus respuestas han sido procesadas correctamente.</p>
+        <button class="btn-next" onclick="location.reload()">Reiniciar</button>
+    </div>
+</div>
 
-        function selectOption(btn, value) {
-            // Quitar clase seleccionada de todos
-            document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-            
-            // Añadir clase al seleccionado
-            btn.classList.add('selected');
-            selectedValue = value;
-            
-            // Habilitar botón de envío
-            document.getElementById('submit-btn').disabled = false;
+<script>
+    const questions = [
+        "¿Qué tan satisfecho estás con la rapidez del servicio?",
+        "¿La interfaz te resultó intuitiva?",
+        "¿Recomendarías esta herramienta a un colega?",
+        "¿Cómo calificarías la calidad del soporte técnico?",
+        "¿El tiempo de carga fue el esperado?",
+        "¿Encontraste todas las funciones que buscabas?",
+        "¿Qué tan clara fue la documentación proporcionada?",
+        "¿Cómo valoras la relación calidad-precio?",
+        "¿Qué tan probable es que vuelvas a usar el servicio?",
+        "¿En general, cómo calificarías tu experiencia hoy?"
+    ];
+
+    const options = ["Excelente", "Muy Bueno", "Bueno", "Regular", "Pobre"];
+    let currentStep = 0;
+
+    // Generar preguntas dinámicamente
+    const wrapper = document.getElementById('questions-wrapper');
+    questions.forEach((q, index) => {
+        const div = document.createElement('div');
+        div.className = `question-slide ${index === 0 ? 'active' : ''}`;
+        div.innerHTML = `
+            <h2>${q}</h2>
+            <div class="options-group">
+                ${options.map(opt => `
+                    <label class="option-label">
+                        <input type="radio" name="q${index}" value="${opt}" onchange="enableNext()">
+                        ${opt}
+                    </label>
+                `).join('')}
+            </div>
+        `;
+        wrapper.appendChild(div);
+    });
+
+    function updateUI() {
+        // Actualizar contador y barra
+        document.getElementById('current-step').innerText = currentStep + 1;
+        document.getElementById('pb').style.width = ((currentStep + 1) / questions.length * 100) + '%';
+        
+        // Mostrar/Ocultar slides
+        document.querySelectorAll('.question-slide').forEach((slide, index) => {
+            slide.classList.toggle('active', index === currentStep);
+        });
+
+        // Control de botones
+        document.getElementById('prevBtn').disabled = (currentStep === 0);
+        document.getElementById('nextBtn').innerText = (currentStep === questions.length - 1) ? 'Finalizar' : 'Siguiente';
+        
+        enableNext(); // Verificar si ya hay algo seleccionado en este paso
+    }
+
+    function changeStep(n) {
+        if (currentStep + n >= questions.length) {
+            showFinalScreen();
+            return;
         }
+        currentStep += n;
+        updateUI();
+    }
 
-        function submitSurvey() {
-            // Aquí podrías enviar 'selectedValue' a una base de datos o API
-            console.log("Respuesta enviada:", selectedValue);
+    function enableNext() {
+        const currentInputs = document.getElementsByName(`q${currentStep}`);
+        const isSelected = Array.from(currentInputs).some(input => input.checked);
+        document.getElementById('nextBtn').disabled = !isSelected;
+    }
 
-            // Ocultar formulario y mostrar agradecimiento
-            document.getElementById('survey-form').style.display = 'none';
-            document.getElementById('result').style.display = 'block';
-            document.getElementById('feedback-msg').innerText = `Tu respuesta "${selectedValue}" ha sido registrada.`;
-        }
+    function showFinalScreen() {
+        document.getElementById('survey-content').style.display = 'none';
+        document.getElementById('final-screen').style.display = 'block';
+        
+        // Aquí es donde en el futuro capturarás el FormData
+        const data = new FormData(document.getElementById('poll-form'));
+        console.log("Datos listos para enviar:", Object.fromEntries(data));
+    }
 
-        function resetSurvey() {
-            selectedValue = "";
-            document.getElementById('submit-btn').disabled = true;
-            document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-            document.getElementById('survey-form').style.display = 'block';
-            document.getElementById('result').style.display = 'none';
-        }
-    </script>
+    updateUI();
+</script>
 
 </body>
 </html>
