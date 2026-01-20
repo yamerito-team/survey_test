@@ -132,6 +132,33 @@
             text-align: center;
             display: none;
         }
+
+        @media (max-width: 480px) {
+            .survey-container {
+                width: 95%;
+                padding: 1.2rem; /* Menos padding para ganar espacio */
+                box-shadow: none; /* En móvil se ve mejor más plano */
+            }
+
+            h2 {
+                font-size: 1.1rem; /* Texto un poco más pequeño para que no salte tantas líneas */
+            }
+
+            .option-label {
+                padding: 12px; /* Tamaño ideal para el toque del dedo */
+                font-size: 0.95rem;
+            }
+
+            .nav-buttons button {
+                flex: 1; /* Botones más anchos para fácil acceso */
+                margin: 0 5px;
+            }
+        }
+
+        /* Mejora para evitar el zoom automático en iPhone al tocar inputs */
+        input[type="radio"] {
+            transform: scale(1.2);
+        }
     </style>
 </head>
 <body>
