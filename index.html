@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encuesta de Satisfacción Profesional</title>
+    <title>Encuesta</title>
     <style>
         :root {
             --primary-color: #0078d4;
@@ -21,6 +21,9 @@
             justify-content: center;
             align-items: center;
             margin: 0;
+            min-height: 100vh;
+            padding: 12px;
+            align-items: flex-start; /* mejor que center en móviles */
         }
 
         .survey-container {
@@ -118,14 +121,19 @@
             font-weight: 600;
             transition: opacity 0.3s;
         }
-
         .btn-next { background: var(--primary-color); color: white; }
         .btn-prev { background: #edebe9; color: var(--text-main); }
-        
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
+        button{ min-height: 48px; font-size: 1rem; }
+        .btn-next{ width: 100%; }
+        .btn-prev{ width: 100%; opacity: .9; }
+        @media (min-width: 481px){
+            .btn-next,.btn-prev{ width:auto; }
+        }
+
 
         #final-screen {
             text-align: center;
@@ -186,6 +194,50 @@
         <button class="btn-next" onclick="location.reload()">Reiniciar</button>
     </div>
 </div>
+
+<script>
+function getDeviceInfo() {
+  return {
+    screen: {
+      width: window.screen.width,
+      height: window.screen.height
+    },
+    viewport: {
+      width: window.innerWidth,
+      height: window.innerHeight
+    },
+    devicePixelRatio: window.devicePixelRatio || 1,
+    orientation: screen.orientation 
+      ? screen.orientation.type 
+      : (window.innerWidth > window.innerHeight ? 'landscape' : 'portrait'),
+    userAgent: navigator.userAgent
+  };
+}
+
+// Mostrar en consola
+window.addEventListener('resize', () => {
+  console.clear();
+  console.log(getDeviceInfo());
+});
+
+// Opcional: mostrar en pantalla (debug)
+document.addEventListener('DOMContentLoaded', () => {
+  const pre = document.createElement('pre');
+  pre.style.position = 'fixed';
+  pre.style.bottom = '0';
+  pre.style.left = '0';
+  pre.style.right = '0';
+  pre.style.maxHeight = '40vh';
+  pre.style.background = 'rgba(0,0,0,.8)';
+  pre.style.color = '#0f0';
+  pre.style.fontSize = '12px';
+  pre.style.padding = '8px';
+  pre.style.zIndex = '9999';
+  pre.textContent = JSON.stringify(getDeviceInfo(), null, 2);
+  document.body.appendChild(pre);
+});
+</script>
+
 
 <script>
     const questions = [
@@ -260,7 +312,12 @@
         document.getElementById('final-screen').style.display = 'block';
         
         // Aquí es donde en el futuro capturarás el FormData
+        const params = new URLSearchParams(location.search);
+        const extra = Object.fromEntries(params.entries());
+
         const data = new FormData(document.getElementById('poll-form'));
+        for (const [k,v] of Object.entries(extra)) data.append(k, v);
+
         console.log("Datos listos para enviar:", Object.fromEntries(data));
     }
 
