@@ -1,328 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encuesta</title>
-    <style>
-        :root {
-            --primary-color: #0078d4;
-            --bg-color: #f3f2f1;
-            --card-bg: #ffffff;
-            --text-main: #323130;
-            --text-secondary: #605e5c;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-            min-height: 100vh;
-            padding: 12px;
-            align-items: flex-start; /* mejor que center en móviles */
-        }
-
-        .survey-container {
-            background: var(--card-bg);
-            width: 90%;
-            max-width: 500px;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Progress Bar */
-        .progress-container {
-            width: 100%;
-            height: 8px;
-            background: #edebe9;
-            border-radius: 10px;
-            margin-bottom: 2rem;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: var(--primary-color);
-            width: 10%; /* Dinámico */
-            border-radius: 10px;
-            transition: width 0.4s ease;
-        }
-
-        .step-counter {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        /* Preguntas */
-        .question-slide {
-            display: none; /* Se activan con JS */
-            animation: fadeIn 0.5s ease;
-        }
-
-        .question-slide.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(10px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        h2 {
-            font-size: 1.25rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .options-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .option-label {
-            padding: 15px;
-            border: 1px solid #c8c6c4;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: block;
-        }
-
-        .option-label:hover {
-            background-color: #f3f2f1;
-            border-color: var(--primary-color);
-        }
-
-        input[type="radio"] {
-            margin-right: 10px;
-            accent-color: var(--primary-color);
-        }
-
-        /* Navegación */
-        .nav-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 2rem;
-        }
-
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: opacity 0.3s;
-        }
-        .btn-next { background: var(--primary-color); color: white; }
-        .btn-prev { background: #edebe9; color: var(--text-main); }
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        button{ min-height: 48px; font-size: 1rem; }
-        .btn-next{ width: 100%; }
-        .btn-prev{ width: 100%; opacity: .9; }
-        @media (min-width: 481px){
-            .btn-next,.btn-prev{ width:auto; }
-        }
-
-
-        #final-screen {
-            text-align: center;
-            display: none;
-        }
-
-        @media (max-width: 480px) {
-            .survey-container {
-                width: 95%;
-                padding: 1.2rem;
-                margin: 1rem;
-                box-shadow: none;
-            }
-
-            h2 {
-                font-size: 1.1rem; 
-            }
-
-            .option-label {
-                padding: 12px;
-                font-size: 0.95rem;
-            }
-
-            .nav-buttons button {
-                flex: 1;
-                margin: 0 5px;
-            }
-        }
-
-        input[type="radio"] {
-            transform: scale(1.2);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <title>Encuesta</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
+  <div class="survey-container">
 
-<div class="survey-container">
+    <!-- INTRO / SPLASH -->
+    <section id="intro-screen" class="intro-screen">
+      <div class="intro-card">
+        <div class="intro-logo" aria-hidden="true">
+          <!-- Si tienes logo: <img src="logo.png" alt="Logo"> -->
+          <span class="intro-initials">YMT</span>
+        </div>
+        <h1 class="intro-title">Encuesta de Transporte</h1>
+        <p class="intro-subtitle">Anónima • Menos de 1 minuto</p>
+        <button type="button" id="startBtn" class="intro-btn">Comenzar</button>
+      </div>
+    </section>
+
     <div id="survey-content">
-        <div class="step-counter">Pregunta <span id="current-step">1</span> de 10</div>
-        <div class="progress-container">
-            <div class="progress-bar" id="pb"></div>
-        </div>
+      <div class="step-counter">Pregunta <span id="current-step">1</span> de 10</div>
 
+      <div class="progress-container">
+        <div class="progress-bar" id="pb"></div>
+      </div>
+
+      <div class="questions-area">
         <form id="poll-form">
-            <div id="questions-wrapper"></div>
+          <div id="questions-wrapper"></div>
         </form>
+      </div>
 
-        <div class="nav-buttons">
-            <button class="btn-prev" id="prevBtn" onclick="changeStep(-1)" disabled>Anterior</button>
-            <button class="btn-next" id="nextBtn" onclick="changeStep(1)" disabled>Siguiente</button>
-        </div>
+      <div class="nav-buttons">
+        <button type="button" class="btn-prev" id="prevBtn" onclick="changeStep(-1)" disabled>Anterior</button>
+        <button type="button" class="btn-next" id="nextBtn" onclick="changeStep(1)" disabled>Siguiente</button>
+      </div>
     </div>
 
     <div id="final-screen">
-        <h1 style="color: #107c10;">✔</h1>
-        <h2>¡Encuesta Completada!</h2>
-        <p>Tus respuestas han sido procesadas correctamente.</p>
-        <button class="btn-next" onclick="location.reload()">Reiniciar</button>
+      <h1 style="color:#107c10; margin:0;">✔</h1>
+      <h2 style="margin:0;">¡Encuesta Completada!</h2>
+      <p style="margin:0; color:var(--text-secondary);">Tus respuestas han sido procesadas correctamente.</p>
+      <button type="button" class="btn-next" onclick="location.reload()">Reiniciar</button>
     </div>
-</div>
 
-<script>
-function getDeviceInfo() {
-  return {
-    screen: {
-      width: window.screen.width,
-      height: window.screen.height
-    },
-    viewport: {
-      width: window.innerWidth,
-      height: window.innerHeight
-    },
-    devicePixelRatio: window.devicePixelRatio || 1,
-    orientation: screen.orientation 
-      ? screen.orientation.type 
-      : (window.innerWidth > window.innerHeight ? 'landscape' : 'portrait'),
-    userAgent: navigator.userAgent
-  };
-}
+  </div>
 
-// Mostrar en consola
-// window.addEventListener('resize', () => {
-//   console.clear();
-//   console.log(getDeviceInfo());
-// });
-
-// Opcional: mostrar en pantalla (debug)
-// document.addEventListener('DOMContentLoaded', () => {
-//   const pre = document.createElement('pre');
-//   pre.style.position = 'fixed';
-//   pre.style.bottom = '0';
-//   pre.style.left = '0';
-//   pre.style.right = '0';
-//   pre.style.maxHeight = '40vh';
-//   pre.style.background = 'rgba(0,0,0,.8)';
-//   pre.style.color = '#0f0';
-//   pre.style.fontSize = '12px';
-//   pre.style.padding = '8px';
-//   pre.style.zIndex = '9999';
-//   pre.textContent = JSON.stringify(getDeviceInfo(), null, 2);
-//   document.body.appendChild(pre);
-// });
-</script>
-
-
-<script>
-    const questions = [
-        "¿Qué tan satisfecho estás con la rapidez del servicio?",
-        "¿La interfaz te resultó intuitiva?",
-        "¿Recomendarías esta herramienta a un colega?",
-        "¿Cómo calificarías la calidad del soporte técnico?",
-        "¿El tiempo de carga fue el esperado?",
-        "¿Encontraste todas las funciones que buscabas?",
-        "¿Qué tan clara fue la documentación proporcionada?",
-        "¿Cómo valoras la relación calidad-precio?",
-        "¿Qué tan probable es que vuelvas a usar el servicio?",
-        "¿En general, cómo calificarías tu experiencia hoy?"
-    ];
-
-    const options = ["Excelente", "Muy Bueno", "Bueno", "Regular", "Pobre"];
-    let currentStep = 0;
-
-    // Generar preguntas dinámicamente
-    const wrapper = document.getElementById('questions-wrapper');
-    questions.forEach((q, index) => {
-        const div = document.createElement('div');
-        div.className = `question-slide ${index === 0 ? 'active' : ''}`;
-        div.innerHTML = `
-            <h2>${q}</h2>
-            <div class="options-group">
-                ${options.map(opt => `
-                    <label class="option-label">
-                        <input type="radio" name="q${index}" value="${opt}" onchange="enableNext()">
-                        ${opt}
-                    </label>
-                `).join('')}
-            </div>
-        `;
-        wrapper.appendChild(div);
-    });
-
-    function updateUI() {
-        // Actualizar contador y barra
-        document.getElementById('current-step').innerText = currentStep + 1;
-        document.getElementById('pb').style.width = ((currentStep + 1) / questions.length * 100) + '%';
-        
-        // Mostrar/Ocultar slides
-        document.querySelectorAll('.question-slide').forEach((slide, index) => {
-            slide.classList.toggle('active', index === currentStep);
-        });
-
-        // Control de botones
-        document.getElementById('prevBtn').disabled = (currentStep === 0);
-        document.getElementById('nextBtn').innerText = (currentStep === questions.length - 1) ? 'Finalizar' : 'Siguiente';
-        
-        enableNext(); // Verificar si ya hay algo seleccionado en este paso
-    }
-
-    function changeStep(n) {
-        if (currentStep + n >= questions.length) {
-            showFinalScreen();
-            return;
-        }
-        currentStep += n;
-        updateUI();
-    }
-
-    function enableNext() {
-        const currentInputs = document.getElementsByName(`q${currentStep}`);
-        const isSelected = Array.from(currentInputs).some(input => input.checked);
-        document.getElementById('nextBtn').disabled = !isSelected;
-    }
-
-    function showFinalScreen() {
-        document.getElementById('survey-content').style.display = 'none';
-        document.getElementById('final-screen').style.display = 'block';
-        
-        // Aquí es donde en el futuro capturarás el FormData
-        const params = new URLSearchParams(location.search);
-        const extra = Object.fromEntries(params.entries());
-
-        const data = new FormData(document.getElementById('poll-form'));
-        for (const [k,v] of Object.entries(extra)) data.append(k, v);
-
-        console.log("Datos listos para enviar:", Object.fromEntries(data));
-    }
-
-    updateUI();
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
