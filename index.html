@@ -215,27 +215,27 @@ function getDeviceInfo() {
 }
 
 // Mostrar en consola
-window.addEventListener('resize', () => {
-  console.clear();
-  console.log(getDeviceInfo());
-});
+// window.addEventListener('resize', () => {
+//   console.clear();
+//   console.log(getDeviceInfo());
+// });
 
 // Opcional: mostrar en pantalla (debug)
-document.addEventListener('DOMContentLoaded', () => {
-  const pre = document.createElement('pre');
-  pre.style.position = 'fixed';
-  pre.style.bottom = '0';
-  pre.style.left = '0';
-  pre.style.right = '0';
-  pre.style.maxHeight = '40vh';
-  pre.style.background = 'rgba(0,0,0,.8)';
-  pre.style.color = '#0f0';
-  pre.style.fontSize = '12px';
-  pre.style.padding = '8px';
-  pre.style.zIndex = '9999';
-  pre.textContent = JSON.stringify(getDeviceInfo(), null, 2);
-  document.body.appendChild(pre);
-});
+// document.addEventListener('DOMContentLoaded', () => {
+//   const pre = document.createElement('pre');
+//   pre.style.position = 'fixed';
+//   pre.style.bottom = '0';
+//   pre.style.left = '0';
+//   pre.style.right = '0';
+//   pre.style.maxHeight = '40vh';
+//   pre.style.background = 'rgba(0,0,0,.8)';
+//   pre.style.color = '#0f0';
+//   pre.style.fontSize = '12px';
+//   pre.style.padding = '8px';
+//   pre.style.zIndex = '9999';
+//   pre.textContent = JSON.stringify(getDeviceInfo(), null, 2);
+//   document.body.appendChild(pre);
+// });
 </script>
 
 
